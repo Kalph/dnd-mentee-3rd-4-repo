@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        REQUIREMENTS_PATH: ./requirements/prod.txt
+    env_file:
+      - docker-compose.prod.env
+    environment:
+      - DJANGO_SETTINGS_MODULE=backend.settings.prod
+      # - ENV_PATH= # TODO: docker swarm에서는 config/secret 경로 참조용으로 활용하기
+    ports:
+      - 8080:80
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_HOST: "http://isp-demo-api.pnu.askcompany.kr"
+    ports:
+      - 80:80

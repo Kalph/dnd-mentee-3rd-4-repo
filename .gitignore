@@ -1,0 +1,18 @@
+# add
+.idea
+__pycache__
+.env
+.vscode
+.env*
+*.swp
+.ipynb_checkpoints
+backend/backend/media
+test_results
+volumes-data
+docker-compose.prod.env
+ref-codes
+/schemes
+*.backup
+/backend/notebooks/*.ipynb
+docker-compose.dev.env
+

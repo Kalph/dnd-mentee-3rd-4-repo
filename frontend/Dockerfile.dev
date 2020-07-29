@@ -1,0 +1,15 @@
+FROM node:13
+
+ARG PACKAGE_PRODUCTION
+
+WORKDIR /reactproject
+COPY package.json yarn.lock /reactproject/
+RUN yarn install ${PACKAGE_PRODUCTION}
+
+COPY ./src /reactproject/src
+COPY ./public /reactproject/public
+# COPY ./config-overrides.js ./jsconfig.json /reactproject/
+
+EXPOSE 3000
+
+CMD yarn start

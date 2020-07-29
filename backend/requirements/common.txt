@@ -1,0 +1,19 @@
+django~=3.0.0
+django-composite-foreignkey
+djangorestframework
+djangorestframework_jwt
+django-environ
+django-cors-headers
+django-filter
+django-storages~=1.9.0
+drf-writable-nested
+paramiko
+django-bootstrap4
+
+# https://github.com/ESSolutions/django-mssql-backend
+# pyodbc
+# django-mssql-backend
+
+pandas
+
+rich

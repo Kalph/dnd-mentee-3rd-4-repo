@@ -1,0 +1,63 @@
+#
+# ref: https://gist.github.com/denji/b801f19d95b7d7910982c22bb1478f96
+#
+# 1) 서비스를 올린 후에 sentry 컨테이너에서 sentry upgrade 명령을 "Nothing to migrate." 메세지가 나올 때까지 다수 수행해주세요.
+#    - 실행 예) docker-compose
+#      shell> docker-compose -f docker-compose.sentry.yml up -d
+#      shell> docker-compose -f docker-compose.sentry.yml exec sentry sentry upgrade
+# 2) sentry shell 명령으로 장고 쉘로 진입하여, 기본 Organization을 생성해주세요.
+#    Organization가 없을 경우, createuser 명령에서 참조 오류가 발생할 수 있습니다.
+#    - 실행 예) docker-compose
+#      shell> docker-compose -f docker-compose.sentry.yml exec sentry sentry shell
+#      >>> from sentry.models import Organization
+#      >>> Organization.objects.create(name='org1', slug='org1')
+# 3) sentry createuser --superuser 명령으로 슈퍼유저 계정을 생성합니다.
+#    - 실행 예) docker-compose
+#      shell> docker-compose -f docker-compose.sentry.yml exec sentry sentry createuser --superuser
+# 4) 웹브라우저로 서비스 주소로 접근하여, 로그인 후에 초기화 과정을 마무리합니다.
+#
+
+version: "3"
+
+services:
+  redis:
+    image: redis
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=sentry
+      - POSTGRES_PASSWORD=sentry
+      - POSTGRES_DB=sentry
+
+  sentry:
+    image: sentry
+    environment:
+      # 비밀키 생성 명령: docker run --rm sentry config generate-secret-key
+      SENTRY_SECRET_KEY: 2pe6gym8e9r&czk3hhn9a+xai*cr!88r3gu34+e7h#+fhqzpu+
+      SENTRY_POSTGRES_HOST: postgres
+      SENTRY_DB_USER: sentry
+      SENTRY_DB_PASSWORD: sentry
+      SENTRY_REDIS_HOST: redis
+    ports:
+      - 9000:9000
+
+  cron:
+    image: sentry
+    command: "sentry run cron"
+    environment:
+      SENTRY_SECRET_KEY: 2pe6gym8e9r&czk3hhn9a+xai*cr!88r3gu34+e7h#+fhqzpu+
+      SENTRY_POSTGRES_HOST: postgres
+      SENTRY_DB_USER: sentry
+      SENTRY_DB_PASSWORD: sentry
+      SENTRY_REDIS_HOST: redis
+
+  worker:
+    image: sentry
+    command: "sentry run worker"
+    environment:
+      SENTRY_SECRET_KEY: 2pe6gym8e9r&czk3hhn9a+xai*cr!88r3gu34+e7h#+fhqzpu+
+      SENTRY_POSTGRES_HOST: postgres
+      SENTRY_DB_USER: sentry
+      SENTRY_DB_PASSWORD: sentry
+      SENTRY_REDIS_HOST: redis

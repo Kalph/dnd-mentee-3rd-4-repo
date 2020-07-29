@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  #    mssql:
+  #        image: mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-18.04
+  #        environment:
+  #            ACCEPT_EULA: "Y"
+  #            SA_PASSWORD: "<YourStrong_Passw0rd>"
+  #        ports:
+  #            - 1433:1433
+
+  memcached:
+    image: memcached
+
+  redis:
+    image: redis
+    volumes:
+      - ./volumes-data/redis:/data
+
+  backend:
+    depends_on:
+      # - mssql
+      - memcached
+      - redis
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        REQUIREMENTS_PATH: ./requirements/dev.txt
+    env_file:
+      - docker-compose.dev.env
+    ports:
+      - 8000:8000
+      - 8888:8888
+    command: python manage.py runserver 0:8000
+    volumes:
+      - ./backend:/djangoproject
+    stdin_open: true
+    tty: true
+
+  frontend:
+    depends_on:
+      - backend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    command: yarn start
+    volumes:
+      - ./frontend:/frontend
+    stdin_open: true
+    tty: true
